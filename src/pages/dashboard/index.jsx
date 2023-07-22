@@ -6,6 +6,8 @@ import { useLocation } from 'react-router-dom'
 import { Sidebar } from './../../components/sidebar/Sidebar'
 import { CustomCard } from '../../components/card/CustomCard'
 
+import Pagination from '@mui/material/Pagination'
+
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex'
@@ -16,7 +18,10 @@ const useStyles = makeStyles(theme => ({
     marginLeft: 0,
     [theme.breakpoints.up('md')]: {
       marginLeft: props => props.sidebarWidth
-    }
+    },
+    height: '100vh',
+    display: 'flex',
+    flexFlow: 'column'
   },
   toolbar: theme.mixins.toolbar,
   grid: {
@@ -25,6 +30,10 @@ const useStyles = makeStyles(theme => ({
     gap: '1rem',
     width: '80%',
     margin: 'auto'
+  },
+  pagination: {
+    display: 'flex',
+    justifyContent: 'center'
   }
 }))
 
@@ -35,6 +44,16 @@ export default function Dashboard() {
   const location = useLocation()
   const [meals, setMeals] = useState([])
   const [isOpen, setIsOpen] = useState(false)
+  const [page, setPage] = useState(1)
+  const pageSize = 5
+  const totalCards = meals.length
+  const pageCount = Math.ceil(totalCards / pageSize)
+
+  const handlePageChange = (event, value) => {
+    setPage(value)
+  }
+
+  const cardsToDisplay = meals.slice((page - 1) * pageSize, page * pageSize)
 
   const getMealsByCategory = async category => {
     await api
@@ -74,14 +93,19 @@ export default function Dashboard() {
     <div className={classes.root}>
       <Navbar toggleOpen={toggleOpen} />
       <Sidebar isOpen={isOpen} toggleOpen={toggleOpen} getMealsByCategory={getMealsByCategory} />
-      {/* <Sidebar isOpen={isOpen} toggleOpen={toggleOpen} /> */}
       <main className={classes.content}>
         <div className={classes.toolbar}></div>
         <div className={classes.grid}>
-          {meals.map((meal, index) => {
+          {cardsToDisplay.map((meal, index) => {
             return <CustomCard key={index} meal={meal} />
           })}
         </div>
+        <Pagination
+          className={classes.pagination}
+          count={pageCount}
+          page={page}
+          onChange={handlePageChange}
+        />
       </main>
     </div>
   )

@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import MenuIcon from '@mui/icons-material/Menu'
-import SearchIcon from '@mui/icons-material/Search'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import { setToken } from '../../store'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import SearchInput from '../searchInput/SearchInput'
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -58,9 +58,7 @@ export const Navbar = ({ toggleOpen }) => {
         <Typography variant='h6' noWrap className={classes.title}>
           Meals
         </Typography>
-        <IconButton color='inherit'>
-          <SearchIcon />
-        </IconButton>
+        <SearchInput />
         <IconButton color='inherit' onClick={handleMenuOpen}>
           <AccountCircleIcon className={classes.avatar} />
         </IconButton>

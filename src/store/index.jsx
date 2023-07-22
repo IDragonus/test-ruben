@@ -17,6 +17,11 @@ const initialStateAuth = {
   user: ''
 }
 
+const initialStateSearch = {
+  searchTerm: '',
+  searchHistory: []
+}
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: initialStateAuth,
@@ -33,13 +38,27 @@ const authSlice = createSlice({
   }
 })
 
+const searchSlice = createSlice({
+  name: 'search',
+  initialState: initialStateSearch,
+  reducers: {
+    setSearchTerm: (state, action) => {
+      state.searchTerm = action.payload
+    },
+    setSearchHistory: (state, action) => {
+      state.searchHistory = action.payload
+    }
+  }
+})
+
 const persistConfig = {
   key: 'root',
   storage
 }
 
 const rootReducer = combineReducers({
-  auth: authSlice.reducer
+  auth: authSlice.reducer,
+  search: searchSlice.reducer
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
@@ -57,5 +76,7 @@ const store = configureStore({
 export const persist = persistStore(store)
 
 export const { setRememberMe, setToken, setUser } = authSlice.actions
+
+export const { setSearchTerm, setSearchHistory } = searchSlice.actions
 
 export default store
