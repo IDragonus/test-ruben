@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import SearchInput from '../searchInput/SearchInput'
+import './styles.css'
 
 const useStyles = makeStyles(theme => ({
   appBar: {

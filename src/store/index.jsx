@@ -23,7 +23,9 @@ const initialStateSearch = {
 }
 
 const initialStateMeals = {
-  meals: []
+  meals: [],
+  likes: [],
+  stars: []
 }
 
 const authSlice = createSlice({
@@ -61,6 +63,12 @@ const mealsSlice = createSlice({
   reducers: {
     setMeals: (state, action) => {
       state.meals = action.payload
+    },
+    setLikes: (state, action) => {
+      state.likes = action.payload
+    },
+    setStarts: (state, action) => {
+      state.stars = action.payload
     }
   }
 })
@@ -92,6 +100,6 @@ export const persist = persistStore(store)
 
 export const { setRememberMe, setToken, setUser } = authSlice.actions
 export const { setSearchTerm, setSearchHistory } = searchSlice.actions
-export const { setMeals } = mealsSlice.actions
+export const { setMeals, setLikes, setStarts } = mealsSlice.actions
 
 export default store
