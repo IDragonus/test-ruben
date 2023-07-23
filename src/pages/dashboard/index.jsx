@@ -5,6 +5,8 @@ import { makeStyles } from '@mui/styles'
 import { useLocation } from 'react-router-dom'
 import { Sidebar } from './../../components/sidebar/Sidebar'
 import { CustomCard } from '../../components/card/CustomCard'
+import { useSelector, useDispatch } from 'react-redux'
+import { setMeals } from '../../store'
 
 import Pagination from '@mui/material/Pagination'
 
@@ -38,16 +40,17 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export default function Dashboard() {
+  const meals = useSelector(state => state.meals.meals)
   const sidebarRef = useRef(null)
   const sidebarWidth = sidebarRef.current ? sidebarRef.current.clientWidth : 0
   const classes = useStyles({ sidebarWidth })
   const location = useLocation()
-  const [meals, setMeals] = useState([])
   const [isOpen, setIsOpen] = useState(false)
   const [page, setPage] = useState(1)
   const pageSize = 5
   const totalCards = meals.length
   const pageCount = Math.ceil(totalCards / pageSize)
+  const dispatch = useDispatch()
 
   const handlePageChange = (event, value) => {
     setPage(value)
@@ -59,7 +62,7 @@ export default function Dashboard() {
     await api
       .get(`/json/v1/1/filter.php?c=${category}`)
       .then(res => {
-        setMeals(res.data.meals)
+        dispatch(setMeals(res.data.meals))
       })
       .catch(err => {
         console.log(err)
@@ -78,7 +81,7 @@ export default function Dashboard() {
     await api
       .get('/json/v1/1/filter.php?a=Canadian')
       .then(res => {
-        setMeals(res.data.meals)
+        dispatch(setMeals(res.data.meals))
       })
       .catch(err => {
         console.log(err)

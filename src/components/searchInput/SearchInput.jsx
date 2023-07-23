@@ -1,9 +1,12 @@
 import { TextField, InputAdornment, Chip } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import SearchIcon from '@mui/icons-material/Search'
+import ClearIcon from '@mui/icons-material/Clear'
 import { useSelector, useDispatch } from 'react-redux'
-import { setSearchTerm, setSearchHistory } from '../../store'
+import { setSearchTerm, setSearchHistory, setMeals } from '../../store'
 import './style.css'
+import { useEffect } from 'react'
+import { api } from '../../api'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -24,26 +27,57 @@ function SearchInput() {
   const dispatch = useDispatch()
   const searchTerm = useSelector(state => state.search.searchTerm)
   const searchHistory = useSelector(state => state.search.searchHistory)
+  useEffect(() => {
+    console.log(searchHistory)
+  }, [searchHistory])
 
   const handleSearchTermChange = event => {
     dispatch(setSearchTerm(event.target.value))
   }
 
+  const getMealsByName = async name => {
+    await api
+      .get(`/json/v1/1/search.php?s=${name}`)
+      .then(res => {
+        if (res.data.meals === null) {
+          getMeals()
+        } else {
+          dispatch(setMeals(res.data.meals))
+        }
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+
+  const getMeals = async () => {
+    await api
+      .get('/json/v1/1/filter.php?a=Canadian')
+      .then(res => {
+        dispatch(setMeals(res.data.meals))
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+
   const handleSearchSubmit = event => {
     event.preventDefault()
     if (searchTerm.trim() === '') {
+      getMeals()
       return
     }
     if (!searchHistory.includes(searchTerm)) {
-      dispatch(setSearchHistory(prevSearchHistory => [...prevSearchHistory.slice(-9), searchTerm]))
+      if (searchHistory.length != 10) {
+        dispatch(setSearchHistory([...searchHistory, searchTerm]))
+      } else if (searchHistory.length === 10) {
+        let newHistory = [...searchHistory]
+        newHistory.shift()
+        newHistory.push(searchTerm)
+        dispatch(setSearchHistory(newHistory))
+      }
     }
-    setSearchTerm('')
-  }
-
-  const handleChipDelete = chipToDelete => () => {
-    dispatch(
-      setSearchHistory(prevSearchHistory => prevSearchHistory.filter(chip => chip !== chipToDelete))
-    )
+    getMealsByName(searchTerm)
   }
 
   return (
@@ -51,8 +85,7 @@ function SearchInput() {
       <form className={classes.root} noValidate onSubmit={handleSearchSubmit}>
         <TextField
           id='search-input'
-          label='Buscar'
-          type='search'
+          type='text'
           value={searchTerm}
           onChange={handleSearchTermChange}
           InputProps={{
@@ -60,14 +93,23 @@ function SearchInput() {
               <InputAdornment position='start'>
                 <SearchIcon />
               </InputAdornment>
+            ),
+            endAdornment: (
+              <InputAdornment
+                position='end'
+                onClick={() => {
+                  getMeals()
+                  dispatch(setSearchTerm(''))
+                }}>
+                <ClearIcon />
+              </InputAdornment>
             )
           }}
         />
       </form>
       <div className={classes.root}>
-        {searchHistory.map(searchTag => (
-          <Chip key={searchTag} label={searchTag} onDelete={handleChipDelete(searchTag)} />
-        ))}
+        {searchHistory &&
+          searchHistory.map(searchTag => <Chip key={searchTag} label={searchTag} />)}
       </div>
     </div>
   )

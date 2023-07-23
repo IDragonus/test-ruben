@@ -1,4 +1,9 @@
 form.makeStyles-root-11 {
   background: #fff;
   border-radius: 4px;
+  width: 100%;
+}
+
+form.makeStyles-root-11 > div {
+  width: 100%;
 }
